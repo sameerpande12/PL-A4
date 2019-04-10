@@ -59,9 +59,25 @@ let endStr = "end"
 let dot ='.'
 let backslash = '\\'
 
+let colon = ":"
 let letStr = "let"
+let tint = "Tint"
+let tbool = "Tbool"
+let tunit = "Tunit"
+
+
+
 rule read = parse
 eof                { EOF }
+
+    | colon            {COLON}
+    | tint             {ITYPE}
+    | tbool            {BTYPE}
+    | tunit            {UTYPE}
+    
+
+
+
     | integers as n  { INT (int_of_string n) }
     | plus              { PLUS }
     | minus             {MINUS}
@@ -99,4 +115,6 @@ eof                { EOF }
     | endStr            {END}
     | backslash         {BACKSLASH}
     | whitespace       {read lexbuf}
+
+
     | _                { raise Not_implemented }

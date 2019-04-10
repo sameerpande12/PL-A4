@@ -95,9 +95,9 @@ let rec getType g e  = match e with
      | _ -> raise TypeException
     )
   | Let(d,e1) -> getType ((getYield g d)@g) e1
-  | FunctionAbstraction(x,e1)->(*assuming x is already added to the table g*)
-    let xtype = getVarType g x in
-    Tfunc(xtype , getType g e1)
+  | FunctionAbstraction((x,xtype),e1)->(*assuming x is already added to the table g*)
+
+    Tfunc( xtype , getType ((x,xtype)::g) e1)
 
   | FunctionCall(e1,e2) ->
     let type1 = getType g e1 in
@@ -110,7 +110,10 @@ let rec getType g e  = match e with
 
 and getYield g d = match d with(*returns the yield obtained by defintion d using table g*)
 
-   Simple(x,e) -> [(x, getType g e)]
+    Simple((x,xtype),e) ->
+    let etype = getType g e in
+    if(xtype = etype)then [(x, xtype)]
+    else raise TypeException
   | Sequence( dlist ) ->
     if(dlist = []) then []
     else
@@ -123,7 +126,8 @@ and getYield g d = match d with(*returns the yield obtained by defintion d using
       let doesIntersect =
         try
           let xvar = getDefinedVar (VarSet.empty) (Parallel(dlist)) in
-          false
+          if( VarSet.is_empty xvar )then false
+          else false (*just added to check any exception thrown*)
         with IntersectionException -> true
       in
 
@@ -138,7 +142,7 @@ and getYield g d = match d with(*returns the yield obtained by defintion d using
 
 
 and getDefinedVar vset d  = match d with(*returns a set of DefinedVariables in d. vset represents the variables defined so far.*)
-    Simple(x,e) -> if(VarSet.mem x  vset) then vset
+    Simple( (x,xtype),e) -> if(VarSet.mem x vset) then vset
     else  (VarSet.add x vset)
   | Sequence(dlist)->
     List.fold_right  VarSet.union (List.map (getDefinedVar vset) dlist) (VarSet.empty)
@@ -159,18 +163,20 @@ and getDefinedVar vset d  = match d with(*returns a set of DefinedVariables in d
 
 let rec hastype g e t =(*returns boolean. True if e has type t under type assumption g. False otherwise( false also when TypeExcpetion occurs)*)
   match e with
-    FunctionAbstraction(x,e1)->
+    FunctionAbstraction((x,xtype),e1)->
     ( match t with
         Tfunc(tau1,tau2)->
-        hastype ((x,tau1)::g) e1 tau2
-      | _ -> false
-     )
+                            if(xtype = tau1)then
+                              hastype ((x,tau1)::g) e1 tau2
+                            else false
+      | _ ->                false
+    )
 
   | _ ->
-  try
-    if(getType g e = t) then true
-    else false
-  with TypeException -> false
+    try
+        if(getType g e = t) then true
+        else false
+        with TypeException -> false
 
 
 let rec findFromList x dump =(*find an element x from list dump. Returns True if found, false if not*)
@@ -200,5 +206,6 @@ let rec yields g d g_dash =(*boolean which determines if definition d yields g_d
 
        in
 
-      (agrees g_prime g_dash [])&&(agrees g_dash g_prime [])
+       (agrees g_dash g_prime [])(*since it was given on Piazza to make only one sided check*)
+
     with TypeException -> false

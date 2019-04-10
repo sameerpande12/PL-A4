@@ -27,7 +27,7 @@ let rec print_value tr = match tr with
   | _ -> raise Not_implemented
 ;;
 let rec print_def df = match df with
-  Simple(l,r) -> "def " ^ l ^ " = " ^ (print_tree r)
+    Simple((l,ltype),r) -> "def " ^ l ^ " = " ^ (print_tree r)
   | _ -> raise Not_implemented
 ;;
 
@@ -44,7 +44,8 @@ let binding rho s = toAnswer (rho s);;
 (* Both use the same lexer in A1 but different parser in A3 *)
 let exp_parser s rho = A3.exp_parser A2.read (Lexing.from_string s) ;;
 let def_parser s rho = A3.def_parser A2.read (Lexing.from_string s) ;;
-
+let type_parser s rho = A3.type_parser A2.read (Lexing.from_string s) ;;
+let scan s = A2.read (Lexing.from_string s);;
 (* Input is given as string and output is a value *)
 let rho s = match s with
   "X" -> NumVal 5
@@ -52,6 +53,7 @@ let rho s = match s with
   |  "Z" -> TupVal (3, [NumVal 5; BoolVal true; NumVal 1])
   | _ -> raise Not_implemented
 ;;
+
 
 (* Sample parsing *)
 print_endline ( print_tree (exp_parser "5" rho));;
