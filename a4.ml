@@ -111,9 +111,9 @@ let rec getType g e  = match e with
 and getYield g d = match d with(*returns the yield obtained by defintion d using table g*)
 
     Simple((x,xtype),e) ->
-    let etype = getType g e in
-    if(xtype = etype)then [(x, xtype)]
-    else raise TypeException
+     let etype = getType g e in
+     if(xtype = etype)then [(x, xtype)]
+     else raise TypeException
   | Sequence( dlist ) ->
     if(dlist = []) then []
     else
@@ -176,7 +176,7 @@ let rec hastype g e t =(*returns boolean. True if e has type t under type assump
     try
         if(getType g e = t) then true
         else false
-        with TypeException -> false
+        with _ -> false
 
 
 let rec findFromList x dump =(*find an element x from list dump. Returns True if found, false if not*)
@@ -202,10 +202,10 @@ let rec yields g d g_dash =(*boolean which determines if definition d yields g_d
                   agrees (b) g2 ((fst a)::dump)
                 else
                   false
-            with Not_found -> false
+              with _ -> false
 
        in
 
        (agrees g_dash g_prime [])(*since it was given on Piazza to make only one sided check*)
 
-    with TypeException -> false
+    with _ -> false

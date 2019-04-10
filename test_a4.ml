@@ -60,12 +60,12 @@ print_endline ( print_tree (exp_parser "5" rho));;
 print_endline ( print_def (def_parser "def a=5" rho));;
 
 (* Sample test case *)
-let e = (exp_parser "\\X.Y" rho);;
+let e = (exp_parser "\\X:Tint.Y" rho);;
 let t = Tfunc (Tint, Tbool);;
 
 (* Type assumptions as a list of tuples of the form (variable name, type) *)
 let g = [ ("X", Tint); ("Y", Tbool); ("Z", Ttuple [Tint ; Tbool ; Tint]); ("W", Tfunc (Tint, Tbool))];;
-let d = (def_parser "def U = X ; def V = Y" rho);;
+let d = (def_parser "def U:Tint = X ; def V:Tbool = Y" rho);;
 let g_dash = [("U", Tint); ("V", Tbool)];;
 
 let parse s = exp_parser s rho;;

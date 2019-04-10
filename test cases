@@ -48,6 +48,6 @@ let t = Tint;;
 hastype g e t;; (* should return true *)
 
 (* You may have to implement some equation solving to handle such cases. *)
-let e = exp_parser "proj(1,2) if X then (3,X) else (4,4) fi" rho;;
+let e = exp_parser "proj(1,2)( if X then (3,X) else (4,4) fi)" rho;;
 let t = Tint;;
 hastype g e t;; (* should return false since the ifte expression forces one branch to be of type Ttuple(Tint, Tbool) and the other branch to be of type Ttuple(Tint, Tint *)

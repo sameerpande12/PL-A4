@@ -27,10 +27,10 @@ let rec type_to_string t = match t with
 | Tunit -> "()"
 
 (* Takes an exp and checks if it has type t. The answer is cross-checked with user provided answer *)
-let test_exp s tup = 
+let test_exp s tup =
 try
-    let tree = exp_parser s and 
-    type_check = fst tup and 
+    let tree = exp_parser s and
+    type_check = fst tup and
     ans = snd tup in
     let result = hastype g tree type_check in
     if(result = ans) then Printf.printf"\n\"%s\" with type \"%s\"-> Test Case Passed\n" s (type_to_string type_check)
@@ -38,13 +38,13 @@ try
 
 with e -> Printf.printf"\n\"%s\" -> Exception Encountered ---> %s\n" s (Printexc.to_string e)
 
-let test_def s tup = 
+let test_def s tup =
 try
-    let tree = def_parser s and 
-    type_check = fst tup and 
+    let tree = def_parser s and
+    type_check = fst tup and
     ans = snd tup in
     let result = yields g tree type_check in
-    if(result = ans) then Printf.printf"\n\"%s\"-> Test Case Passed\n" s 
+    if(result = ans) then Printf.printf"\n\"%s\"-> Test Case Passed\n" s
     else Printf.printf "\n\"%s\"-> Test Case Failed (%B)\n " s  result
 
 with e -> Printf.printf"\"%s\" -> Exception Encountered ---> %s\n" s (Printexc.to_string e)
@@ -54,11 +54,11 @@ let exp_tester = Hashtbl.create 100;;
 Hashtbl.add exp_tester "\\X.X" (Tfunc(Ttuple([Tint; Tbool]), Ttuple([Tint; Tbool])), true);
 Hashtbl.add exp_tester "let def A = Z(X) in W(A) end" (Tint, true);
 Hashtbl.add exp_tester "\\M.(W(Z(M)))" (Tfunc(Tint, Tint), true);
-Hashtbl.add exp_tester "proj(2, 3) ((X, T), (let def X = T /\\ F in not X end, \\X.(proj(1,2) X)), (3, 5))" (Ttuple([Tbool; Tfunc(Ttuple([Tint; Tbool]), Tint)]), false);
+Hashtbl.add exp_tester "proj(2, 3) ((X, T), (let def X:Tbool = T /\\ F in not X end, \\X:Tbool.(proj(1,2) (X,Y) )), (3, 5))" (Ttuple([Tbool; Tfunc(Ttuple([Tint; Tbool]), Tint)]), false);
 Hashtbl.add exp_tester "proj(1,2) (if Y then (1, 2) else (2, 3) fi)" (Tint, true);
 Hashtbl.add exp_tester "if Y then (1, 2) else (T, 4) fi" (Ttuple([Tint; Tint]), false);
-Hashtbl.add exp_tester "let def A = W(X) in A + 4 end" (Tint, false);
-Hashtbl.add exp_tester "proj(2,4)proj(2,2)(T, (8,(if 5>6 then (\\Fs.W) else (\\Fs.W) fi),T,4) )" (Tfunc(Tint, Tfunc(Tbool, Tint)), true);
+Hashtbl.add exp_tester "let def A:Tint = W(X) in A + 4 end" (Tint, false);
+Hashtbl.add exp_tester "proj(2,4)proj(2,2)(T, (8,(if 5>6 then (\\Fs:Tint.W) else (\\Fs:Tint.W) fi),T,4) )" (Tfunc(Tint, Tfunc(Tbool, Tint)), true);
 
 
 Printf.printf"\n----------------------------------------\n";;
